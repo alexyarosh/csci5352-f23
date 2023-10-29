@@ -5,6 +5,7 @@
 import pandas as pd
 import numpy as np
 import argparse 
+from sqlalchemy import create_engine
 
 def extract_data(source):
     return pd.read_csv(source)
@@ -16,14 +17,16 @@ def transform_data(data):
     new_data.drop(columns = ['MonthYear', 'Sex upon Outcome'], inplace=True)
     return new_data
 
-def load_data(data, target):
-    data.to_csv(target)
+def load_data(data):
+    db_url = "postgresql+psycopg2://alex:hunter2@db:5432/shelter"
+    conn = create_engine(db_url)
+    data.to_sql("outcomes", conn, if_exists="append", index=False)
 
 
 if __name__ == "__main__": 
     parser = argparse.ArgumentParser()
     parser.add_argument('source', help='source csv')
-    parser.add_argument('target', help='target csv')
+#    parser.add_argument('target', help='target csv')
     args = parser.parse_args()
 
     print("Starting...")
