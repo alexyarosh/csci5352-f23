@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from collections import OrderedDict
 from pathlib import Path
+from google.cloud import storage
 
 # creating the global mapping for outcome types
 outcomes_map = {'Rto-Adopt':1, 
@@ -17,7 +18,9 @@ outcomes_map = {'Rto-Adopt':1,
                 'Stolen':11}
 
 def transform_data(source_csv, target_dir):
+
     new_data = pd.read_csv(source_csv)
+
     new_data = prep_data(new_data)
 
     dim_animal = prep_animal_dim(new_data)
@@ -29,6 +32,7 @@ def transform_data(source_csv, target_dir):
     Path(target_dir).mkdir(parents=True, exist_ok=True)
 
     dim_animal.to_parquet(target_dir+'/dim_animals.parquet')
+    print(dim_animal.head())
     dim_dates.to_parquet(target_dir+'/dim_dates.parquet')
     dim_outcome_types.to_parquet(target_dir+'/dim_outcome_types.parquet')
     fct_outcomes.to_parquet(target_dir+'/fct_outcomes.parquet')
@@ -74,6 +78,7 @@ def prep_animal_dim(data):
     # rename the columns to agree with the DB tables
     animal_dim.columns = ['animal_id', 'name', 'dob', 'sex', 'animal_type', 'breed', 'color']
     
+    print(animal_dim.drop_duplicates())
     # drop duplicate animal records
     return animal_dim.drop_duplicates()
 
