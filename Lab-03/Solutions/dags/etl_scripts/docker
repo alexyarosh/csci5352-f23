@@ -1,0 +1,7 @@
+FROM apache/airflow:2.7.3
+
+USER root
+
+RUN pip install pandas "apache-airflow==${AIRFLOW_VERSION}" lxml
+
+USER airflow
